@@ -366,18 +366,6 @@ This framework can be used for:
 - Ensure conda environment is activated
 - Check all dependencies are installed: `conda list`
 
-## Citation
-
-If you use this research framework, please cite:
-
-```bibtex
-@software{aisecproject2025,
-  title={AI Security Research: DDoS Detection and Adversarial Evasion},
-  year={2025},
-  description={A framework for DDoS detection using deep learning and adversarial robustness evaluation}
-}
-```
-
 ## License
 
 This project is for educational and research purposes.
