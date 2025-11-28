@@ -7,7 +7,7 @@ A comprehensive research framework for studying DDoS attack detection using deep
 This project provides:
 
 1. **Simulated Network Environment**: A virtual network for testing DDoS attacks and prevention mechanisms
-2. **Deep Learning Detection Models**: CNN, LSTM, Transformer, and Hybrid architectures for DDoS traffic classification
+2. **Deep Learning Detection Models**: CNN, LSTM, Transformer, and Hybrid CNN-LSTM architectures for DDoS traffic classification
 3. **Adversarial Attack Framework**: GAN-based and gradient-based methods for generating evasive traffic patterns
 4. **Comprehensive Evaluation**: Metrics for detection accuracy, false positive rate, latency, and adversarial robustness
 
