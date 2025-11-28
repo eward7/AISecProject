@@ -1,0 +1,102 @@
+# Configuration for DDoS Detection Model Training
+# This file contains default hyperparameters and settings
+
+# Model Configuration
+model:
+  type: "cnn"  # Options: cnn, lstm, transformer, hybrid
+  input_features: 76
+  num_classes: 2
+  
+  # CNN-specific settings
+  cnn:
+    conv_channels: [64, 128, 256]
+    kernel_size: 3
+    fc_hidden: 256
+    dropout: 0.5
+  
+  # LSTM-specific settings
+  lstm:
+    hidden_size: 128
+    num_layers: 2
+    bidirectional: true
+    dropout: 0.3
+  
+  # Transformer-specific settings
+  transformer:
+    d_model: 128
+    nhead: 8
+    num_encoder_layers: 4
+    dim_feedforward: 512
+    dropout: 0.1
+    max_seq_len: 100
+  
+  # Hybrid-specific settings
+  hybrid:
+    cnn_channels: [32, 64]
+    lstm_hidden: 64
+    lstm_layers: 2
+    dropout: 0.3
+
+# Training Configuration
+training:
+  epochs: 100
+  batch_size: 64
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  patience: 15
+  gradient_clip: 1.0
+  scheduler: "reduce_on_plateau"  # Options: reduce_on_plateau, cosine
+
+# Data Configuration
+data:
+  # For synthetic data
+  n_samples: 50000
+  attack_ratio: 0.3
+  
+  # For CICDDoS2019 dataset
+  dataset_path: null  # Set to path if using real dataset
+  sample_size_per_file: null
+  test_size: 0.2
+  val_size: 0.1
+  
+  # Sequence settings (for LSTM/Transformer)
+  sequence_length: 10
+
+# Adversarial Attack Configuration
+adversarial:
+  # FGSM settings
+  fgsm:
+    epsilon: 0.1
+  
+  # PGD settings
+  pgd:
+    epsilon: 0.1
+    alpha: 0.01
+    num_iter: 40
+  
+  # GAN settings
+  gan:
+    latent_dim: 100
+    epochs: 100
+    batch_size: 64
+    lr_generator: 0.0002
+    lr_discriminator: 0.0002
+  
+  # Perturbation generator settings
+  perturbation:
+    epsilon: 0.1
+    epochs: 50
+
+# Evaluation Configuration
+evaluation:
+  measure_latency: true
+  n_latency_samples: 100
+  
+  # Adversarial evaluation
+  epsilon_values: [0.01, 0.05, 0.1, 0.2, 0.3]
+
+# Output Configuration
+output:
+  results_dir: "./results"
+  checkpoint_dir: "./checkpoints"
+  log_level: "INFO"

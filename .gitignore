@@ -1,0 +1,84 @@
+# AISecProject - Python Package
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Data files (too large for git)
+data/*.csv
+data/*.parquet
+data/*.pkl
+
+# Model checkpoints (too large for git)
+models/*.pt
+models/*.pth
+models/*.h5
+checkpoints/
+*.ckpt
+
+# Results (generated)
+results/*.json
+results/*.txt
+results/*.csv
+results/*.png
+results/*.pdf
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Environment
+.env
+.env.local
+
+# Coverage
+.coverage
+htmlcov/
+
+# pytest
+.pytest_cache/
+
+# mypy
+.mypy_cache/

@@ -1,0 +1,10 @@
+# Keep this directory for storing data
+# Place CICDDoS2019 CSV files here
+
+# Download instructions:
+# 1. Visit: https://www.unb.ca/cic/datasets/ddos-2019.html
+# 2. Download the CSV files for the attack types you want to study
+# 3. Place them in this directory
+
+# Alternatively, the code will use synthetic data generation
+# if no real data is available
