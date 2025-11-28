@@ -130,7 +130,7 @@ python main.py train --model-type cnn --data-path ./data --epochs 100
 | `--batch-size` | Batch size | 64 |
 | `--learning-rate` | Learning rate | 0.001 |
 | `--patience` | Early stopping patience | 15 |
-| `--device` | Device (auto, cuda, cpu, mps) | auto |
+| `--device` | Device (auto, cuda, cpu, mps) | auto | note: auto option doesn't seem to work when doing evaluation
 | `--output-dir` | Output directory | ./results |
 
 ### Evaluating a Model
