@@ -1,0 +1,168 @@
+{
+  "experiment_config": {
+    "difficulty": "hard",
+    "n_samples": 50000,
+    "epochs": 50,
+    "device": "cuda"
+  },
+  "results": {
+    "cnn": {
+      "model_type": "cnn",
+      "n_parameters": 747650,
+      "training_time_seconds": 120.1040723323822,
+      "epochs_trained": 20,
+      "final_train_accuracy": 0.9959722222222223,
+      "final_val_accuracy": 0.989,
+      "final_val_f1": 0.9818181818181818,
+      "test_metrics": {
+        "accuracy": 0.9884,
+        "precision": 0.9724770642201835,
+        "recall": 0.9893333333333333,
+        "f1": 0.9808327825512227,
+        "fpr": 0.012,
+        "auc": 0.9993858095238096,
+        "latency_mean_ms": 1.7472954062611734,
+        "latency_std_ms": 1.3447794425734942,
+        "latency_p99_ms": 6.642664749988398
+      },
+      "adversarial_metrics": {
+        "fgsm": {
+          "original_detection_rate": 0.9833333333333333,
+          "adversarial_detection_rate": 1.0,
+          "evasion_success_rate": 0.0,
+          "detection_rate_drop": -0.01666666666666672,
+          "mean_l2_perturbation": "0.8717798",
+          "mean_linf_perturbation": "0.100000024"
+        },
+        "pgd": {
+          "original_detection_rate": 0.06,
+          "adversarial_detection_rate": 0.13666666666666666,
+          "evasion_success_rate": 0.8633333333333333,
+          "detection_rate_drop": -0.07666666666666666,
+          "mean_l2_perturbation": "0.7225292",
+          "mean_linf_perturbation": "0.09980003"
+        }
+      },
+      "checkpoint_dir": "results_comparison/cnn_hard_20251205_135540"
+    },
+    "lstm": {
+      "model_type": "lstm",
+      "n_parameters": 735491,
+      "training_time_seconds": 185.0232138633728,
+      "epochs_trained": 29,
+      "final_train_accuracy": 0.9987219026978967,
+      "final_val_accuracy": 0.9503883738411426,
+      "final_val_f1": 0.9140625,
+      "test_metrics": {
+        "accuracy": 0.9377439695726153,
+        "precision": 0.8794757033248082,
+        "recall": 0.9182242990654206,
+        "f1": 0.8984323971260614,
+        "fpr": 0.053895639742673335,
+        "auc": 0.9806486800127117,
+        "latency_mean_ms": 1.2889847812402877,
+        "latency_std_ms": 0.5160234467138973,
+        "latency_p99_ms": 3.0245780899076617
+      },
+      "adversarial_metrics": {
+        "fgsm": {
+          "original_detection_rate": 1.0,
+          "adversarial_detection_rate": 1.0,
+          "evasion_success_rate": 0.0,
+          "detection_rate_drop": 0.0,
+          "mean_l2_perturbation": "0.8717798",
+          "mean_linf_perturbation": "0.100000024"
+        },
+        "pgd": {
+          "original_detection_rate": 1.0,
+          "adversarial_detection_rate": 1.0,
+          "evasion_success_rate": 0.0,
+          "detection_rate_drop": 0.0,
+          "mean_l2_perturbation": "0.8192027",
+          "mean_linf_perturbation": "0.100000024"
+        }
+      },
+      "checkpoint_dir": "results_comparison/lstm_hard_20251205_135742"
+    },
+    "transformer": {
+      "model_type": "transformer",
+      "n_parameters": 811714,
+      "training_time_seconds": 244.3794572353363,
+      "epochs_trained": 16,
+      "final_train_accuracy": 0.6818093412241949,
+      "final_val_accuracy": 0.6995740415935856,
+      "final_val_f1": 0.0,
+      "test_metrics": {
+        "accuracy": 0.7001301171053949,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "fpr": 0.0,
+        "auc": 0.4960160366311623,
+        "latency_mean_ms": 3.491669078115933,
+        "latency_std_ms": 2.321250733520662,
+        "latency_p99_ms": 9.051944539651227
+      },
+      "adversarial_metrics": {
+        "fgsm": {
+          "original_detection_rate": 0.0,
+          "adversarial_detection_rate": 0.0,
+          "evasion_success_rate": 1.0,
+          "detection_rate_drop": 0.0,
+          "mean_l2_perturbation": "0.8717798",
+          "mean_linf_perturbation": "0.100000024"
+        },
+        "pgd": {
+          "original_detection_rate": 0.0,
+          "adversarial_detection_rate": 0.0,
+          "evasion_success_rate": 1.0,
+          "detection_rate_drop": 0.0,
+          "mean_l2_perturbation": "0.76240367",
+          "mean_linf_perturbation": "0.100000024"
+        }
+      },
+      "checkpoint_dir": "results_comparison/transformer_hard_20251205_140048"
+    },
+    "hybrid": {
+      "model_type": "hybrid",
+      "n_parameters": 180802,
+      "training_time_seconds": 134.5719347000122,
+      "epochs_trained": 19,
+      "final_train_accuracy": 0.9883888888888889,
+      "final_val_accuracy": 0.989,
+      "final_val_f1": 0.9816971713810316,
+      "test_metrics": {
+        "accuracy": 0.9888,
+        "precision": 0.979734219269103,
+        "recall": 0.983,
+        "f1": 0.9813643926788685,
+        "fpr": 0.008714285714285714,
+        "auc": 0.9993347142857143,
+        "latency_mean_ms": 1.7070269374812597,
+        "latency_std_ms": 1.503493051626246,
+        "latency_p99_ms": 6.600021340072999
+      },
+      "adversarial_metrics": {
+        "fgsm": {
+          "original_detection_rate": 0.9666666666666667,
+          "adversarial_detection_rate": 0.9766666666666667,
+          "evasion_success_rate": 0.023333333333333334,
+          "detection_rate_drop": -0.010000000000000009,
+          "mean_l2_perturbation": "0.8717798",
+          "mean_linf_perturbation": "0.100000024"
+        },
+        "pgd": {
+          "original_detection_rate": 0.20666666666666667,
+          "adversarial_detection_rate": 0.0033333333333333335,
+          "evasion_success_rate": 0.9966666666666667,
+          "detection_rate_drop": 0.20333333333333334,
+          "mean_l2_perturbation": "0.60069966",
+          "mean_linf_perturbation": "0.100000024"
+        }
+      },
+      "checkpoint_dir": "results_comparison/hybrid_hard_20251205_140454"
+    }
+  },
+  "best_model": "hybrid",
+  "best_f1": 0.9813643926788685
+}

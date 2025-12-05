@@ -1,0 +1,28 @@
+\begin{table}[t]
+\centering
+\caption{Per-Attack-Type Detection Performance on CICDDoS2019 Test Set (CNN Model)}
+\label{tab:per_attack_performance}
+\small
+\begin{tabular}{llrrrr}
+\toprule
+\textbf{Attack Type} & \textbf{Description} & \textbf{Samples} & \textbf{Accuracy} & \textbf{Recall} & \textbf{F1} \\
+ & & & (\%) & (\%) & (\%) \\
+\midrule
+BENIGN & Legitimate Traffic & 20,029 & 99.95 & - & - \\
+DrDoS_DNS & DNS Amplification & 1,489 & 99.96 & 99.98 & 99.97 \\
+DrDoS_LDAP & LDAP Amplification & 1,556 & 99.94 & 99.94 & 99.93 \\
+DrDoS_MSSQL & MSSQL Amplification & 1,777 & 99.96 & 99.95 & 99.95 \\
+DrDoS_NTP & NTP Amplification & 1,660 & 100.00 & 100.00 & 100.00 \\
+DrDoS_NetBIOS & NetBIOS Amplification & 1,721 & 100.00 & 100.00 & 100.00 \\
+DrDoS_SNMP & SNMP Amplification & 2,150 & 99.96 & 99.96 & 99.96 \\
+DrDoS_SSDP & SSDP Amplification & 2,155 & 99.93 & 99.95 & 99.94 \\
+DrDoS_UDP & UDP Reflection & 1,973 & 99.98 & 99.98 & 99.98 \\
+Syn & SYN Flood & 1,635 & 99.93 & 99.94 & 99.93 \\
+TFTP & TFTP Amplification & 1,814 & 99.93 & 99.95 & 99.94 \\
+UDP-lag & UDP Lag Attack & 1,923 & 99.94 & 99.95 & 99.94 \\
+WebDDoS & Web Application DDoS & 1,549 & 99.98 & 99.99 & 99.98 \\
+\midrule
+\textbf{Overall} & All Traffic & 41,431 & 99.98 & 100.00 & 99.99 \\
+\bottomrule
+\end{tabular}
+\end{table}

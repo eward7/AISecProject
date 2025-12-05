@@ -308,46 +308,149 @@ class DataPreprocessor:
 def load_cicddos2019(
     data_dir: str,
     sample_size: Optional[int] = None,
-    attack_types: Optional[List[str]] = None
+    attack_types: Optional[List[str]] = None,
+    stratified: bool = True,
+    balance_classes: bool = True,
+    min_samples_per_attack: int = 1000
 ) -> pd.DataFrame:
     """
-    Load CICDDoS2019 dataset from directory.
+    Load CICDDoS2019 dataset from directory with stratified sampling.
     
     Args:
         data_dir: Directory containing CSV files
-        sample_size: If provided, sample this many rows per file
+        sample_size: Total samples to load (will be distributed across classes)
         attack_types: If provided, filter to these attack types only
+        stratified: If True, sample proportionally from each file/attack type
+        balance_classes: If True, balance benign vs attack samples to 50/50
+        min_samples_per_attack: Minimum samples per attack type for stratification
         
     Returns:
-        Combined DataFrame
+        Combined DataFrame with stratified samples and balanced classes
     """
     data_path = Path(data_dir)
-    csv_files = list(data_path.glob('*.csv'))
+    # Look for CSV files recursively in subdirectories
+    csv_files = list(data_path.rglob('*.csv'))
     
     if not csv_files:
         raise FileNotFoundError(f"No CSV files found in {data_dir}")
     
     logger.info(f"Found {len(csv_files)} CSV files")
     
+    # First pass: count rows in each file to determine sampling strategy
+    file_sizes = {}
+    if stratified and sample_size:
+        for csv_file in csv_files:
+            # Quick row count using wc -l for speed
+            try:
+                import subprocess
+                result = subprocess.run(['wc', '-l', str(csv_file)], capture_output=True, text=True)
+                row_count = int(result.stdout.split()[0]) - 1  # -1 for header
+            except:
+                # Fallback to slower method  
+                row_count = sum(1 for _ in open(csv_file)) - 1
+            file_sizes[csv_file] = row_count
+            logger.info(f"{csv_file.name}: {row_count:,} rows")
+        
+        total_rows = sum(file_sizes.values())
+        logger.info(f"Total rows across all files: {total_rows:,}")
+    
     dfs = []
     for csv_file in csv_files:
         logger.info(f"Loading {csv_file.name}...")
         try:
-            df = pd.read_csv(csv_file, low_memory=False)
+            # Determine sample size for this file
+            if stratified and sample_size and csv_file in file_sizes:
+                # Proportional sampling based on file size
+                file_sample_size = max(100, int(sample_size * (file_sizes[csv_file] / total_rows)))
+            else:
+                file_sample_size = sample_size if sample_size else None
             
-            if sample_size and len(df) > sample_size:
-                df = df.sample(n=sample_size, random_state=42)
+            # Memory-efficient chunked loading with sampling
+            if file_sample_size and file_sizes.get(csv_file, 0) > file_sample_size:
+                sampled_chunks = []
+                rows_needed = file_sample_size
+                chunk_size = 50000
+                
+                for chunk in pd.read_csv(csv_file, chunksize=chunk_size, low_memory=False):
+                    # Sample from this chunk proportionally
+                    chunk_sample_size = min(len(chunk), rows_needed)
+                    sampled = chunk.sample(n=chunk_sample_size, random_state=42)
+                    sampled_chunks.append(sampled)
+                    rows_needed -= chunk_sample_size
+                    
+                    if rows_needed <= 0:
+                        break
+                
+                df = pd.concat(sampled_chunks, ignore_index=True)
+            else:
+                # File is small enough to load entirely
+                df = pd.read_csv(csv_file, low_memory=False)
+            
+            # Sample from this file
+            if file_sample_size and len(df) > file_sample_size:
+                df = df.sample(n=file_sample_size, random_state=42)
             
             if attack_types:
                 label_col = 'Label' if 'Label' in df.columns else ' Label'
                 df = df[df[label_col].isin(attack_types)]
             
             dfs.append(df)
+            logger.info(f"  Loaded {len(df):,} samples from {csv_file.name}")
         except Exception as e:
             logger.error(f"Error loading {csv_file.name}: {e}")
     
     combined_df = pd.concat(dfs, ignore_index=True)
-    logger.info(f"Total samples loaded: {len(combined_df)}")
+    logger.info(f"Total samples loaded: {len(combined_df):,}")
+    
+    # Standardize label column
+    label_col = 'Label' if 'Label' in combined_df.columns else ' Label'
+    
+    # Balance classes with attack type stratification
+    if balance_classes:
+        benign_df = combined_df[combined_df[label_col] == 'BENIGN']
+        attack_df = combined_df[combined_df[label_col] != 'BENIGN']
+        
+        logger.info(f"\nOriginal distribution:")
+        logger.info(f"  Benign: {len(benign_df):,}")
+        logger.info(f"  Attack: {len(attack_df):,}")
+        
+        # Get all unique attack types
+        attack_types_present = attack_df[label_col].unique()
+        logger.info(f"\nAttack types present: {list(attack_types_present)}")
+        
+        # Strategy: Oversample benign to match attack samples
+        # and ensure all attack types are well represented
+        
+        # Ensure each attack type has minimum representation
+        attack_dfs = []
+        for attack_type in attack_types_present:
+            attack_subset = attack_df[attack_df[label_col] == attack_type]
+            # Ensure minimum samples per attack type
+            n_samples = max(len(attack_subset), min_samples_per_attack)
+            sampled = attack_subset.sample(n=n_samples, random_state=42, replace=(n_samples > len(attack_subset)))
+            attack_dfs.append(sampled)
+            logger.info(f"  {attack_type}: {len(sampled):,} samples (original: {len(attack_subset):,})")
+        
+        # Combine all attack samples
+        attack_df_balanced = pd.concat(attack_dfs, ignore_index=True)
+        
+        # Oversample benign to match total attack samples (50/50 balance)
+        target_benign = len(attack_df_balanced)
+        if len(benign_df) < target_benign:
+            # Oversample benign with replacement
+            benign_df_balanced = benign_df.sample(n=target_benign, random_state=42, replace=True)
+            logger.info(f"\nOversampled benign from {len(benign_df):,} to {target_benign:,}")
+        else:
+            # Downsample benign if we have more than needed
+            benign_df_balanced = benign_df.sample(n=target_benign, random_state=42)
+            logger.info(f"\nDownsampled benign from {len(benign_df):,} to {target_benign:,}")
+        
+        combined_df = pd.concat([benign_df_balanced, attack_df_balanced], ignore_index=True)
+        combined_df = combined_df.sample(frac=1, random_state=42).reset_index(drop=True)  # Shuffle
+        
+        logger.info(f"\nBalanced dataset: {len(benign_df_balanced):,} benign, {len(attack_df_balanced):,} attack")
+        logger.info(f"Final dataset size: {len(combined_df):,}")
+        logger.info(f"Attack types represented: {len(attack_types_present)}")
     
     return combined_df
 
@@ -356,20 +459,27 @@ def create_synthetic_ddos_data(
     n_samples: int = 10000,
     n_features: int = 76,
     attack_ratio: float = 0.3,
-    random_state: int = 42
+    random_state: int = 42,
+    difficulty: str = 'medium'
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Create synthetic DDoS data for testing when real dataset is not available.
     
-    This generates data with patterns similar to real DDoS traffic:
-    - Benign traffic: Normal distribution with moderate variance
-    - Attack traffic: Higher packet rates, specific flag patterns
+    This generates data with patterns similar to real DDoS traffic with
+    configurable difficulty levels to create more realistic and challenging
+    classification tasks.
+    
+    Difficulty levels:
+    - 'easy': Clearly separable classes (for debugging/baseline)
+    - 'medium': Moderate overlap between classes (realistic scenario)  
+    - 'hard': Significant overlap, mimics sophisticated attacks
     
     Args:
         n_samples: Total number of samples
         n_features: Number of features
         attack_ratio: Ratio of attack samples
         random_state: Random seed
+        difficulty: Classification difficulty ('easy', 'medium', 'hard')
         
     Returns:
         Tuple of (features, labels)
@@ -379,23 +489,103 @@ def create_synthetic_ddos_data(
     n_attacks = int(n_samples * attack_ratio)
     n_benign = n_samples - n_attacks
     
-    # Generate benign traffic patterns
-    benign_features = np.random.normal(loc=0.5, scale=0.2, size=(n_benign, n_features))
-    benign_features = np.clip(benign_features, 0, 1)
+    # Difficulty settings control class separation
+    difficulty_params = {
+        'easy': {'mean_sep': 0.4, 'std_benign': 0.15, 'std_attack': 0.2, 'noise': 0.05},
+        'medium': {'mean_sep': 0.2, 'std_benign': 0.25, 'std_attack': 0.3, 'noise': 0.15},
+        'hard': {'mean_sep': 0.1, 'std_benign': 0.3, 'std_attack': 0.35, 'noise': 0.25}
+    }
+    params = difficulty_params.get(difficulty, difficulty_params['medium'])
     
-    # Generate attack traffic patterns
-    # Attacks typically have: high packet rates, specific patterns
-    attack_features = np.random.normal(loc=0.7, scale=0.3, size=(n_attacks, n_features))
+    # ===== BENIGN TRAFFIC =====
+    # Base features with realistic variance
+    benign_base = np.random.normal(loc=0.5, scale=params['std_benign'], size=(n_benign, n_features))
     
-    # Add DDoS-specific patterns to attack traffic
-    # High flow duration variability
-    attack_features[:, 0] = np.random.exponential(scale=0.8, size=n_attacks)
-    # High packet counts
-    attack_features[:, 1:5] = np.random.exponential(scale=1.2, size=(n_attacks, 4))
-    # SYN flood pattern (high SYN flag count)
-    attack_features[:, 46] = np.random.exponential(scale=2.0, size=n_attacks)
+    # Add feature correlations (real traffic has correlated features)
+    # E.g., packet count correlates with byte count
+    correlation_matrix = np.eye(n_features)
+    for i in range(min(10, n_features-1)):
+        correlation_matrix[i, i+1] = 0.5
+        correlation_matrix[i+1, i] = 0.5
     
+    # Apply mild correlations to benign
+    benign_features = benign_base + np.random.multivariate_normal(
+        np.zeros(n_features), 
+        correlation_matrix * 0.01, 
+        size=n_benign
+    )
+    
+    # Some benign traffic has burst patterns (legitimate high traffic)
+    burst_mask = np.random.random(n_benign) < 0.1  # 10% burst traffic
+    benign_features[burst_mask, :10] *= 1.5  # Higher values for burst
+    
+    # ===== ATTACK TRAFFIC =====
+    # Different attack types with varying characteristics
+    n_volumetric = int(n_attacks * 0.4)  # 40% volumetric (easier to detect)
+    n_protocol = int(n_attacks * 0.3)     # 30% protocol attacks
+    n_application = n_attacks - n_volumetric - n_protocol  # 30% application layer (hardest)
+    
+    # --- Volumetric attacks (e.g., UDP flood) ---
+    # Higher mean, but with significant overlap with benign bursts
+    volumetric = np.random.normal(
+        loc=0.5 + params['mean_sep'] * 1.5, 
+        scale=params['std_attack'], 
+        size=(n_volumetric, n_features)
+    )
+    # High packet rates and byte counts
+    volumetric[:, :5] = np.random.exponential(scale=0.8, size=(n_volumetric, 5))
+    # Add noise to make some look more benign
+    volumetric += np.random.normal(0, params['noise'], volumetric.shape)
+    
+    # --- Protocol attacks (e.g., SYN flood) ---
+    protocol = np.random.normal(
+        loc=0.5 + params['mean_sep'], 
+        scale=params['std_attack'], 
+        size=(n_protocol, n_features)
+    )
+    # Specific flag patterns (SYN, RST flags elevated)
+    if n_features > 50:
+        protocol[:, 46:52] = np.random.exponential(scale=1.0, size=(n_protocol, min(6, n_features-46)))
+    # Shorter flow durations
+    protocol[:, 0] = np.random.exponential(scale=0.3, size=n_protocol)
+    protocol += np.random.normal(0, params['noise'], protocol.shape)
+    
+    # --- Application layer attacks (e.g., HTTP flood, Slowloris) ---
+    # These INTENTIONALLY look very similar to benign traffic
+    application = np.random.normal(
+        loc=0.5 + params['mean_sep'] * 0.5,  # Much closer to benign
+        scale=params['std_benign'],  # Same variance as benign!
+        size=(n_application, n_features)
+    )
+    # Subtle differences: slightly higher inter-arrival time variance
+    if n_features > 25:
+        application[:, 22:26] *= 1.2  # IAT features
+    # Some samples are nearly indistinguishable
+    stealth_mask = np.random.random(n_application) < 0.3  # 30% very stealthy
+    application[stealth_mask] = np.random.normal(
+        loc=0.52,  # Almost same as benign
+        scale=params['std_benign'],
+        size=(stealth_mask.sum(), n_features)
+    )
+    application += np.random.normal(0, params['noise'] * 1.5, application.shape)
+    
+    # Combine attack types
+    attack_features = np.vstack([volumetric, protocol, application])
+    
+    # Shuffle attack types
+    attack_shuffle = np.random.permutation(n_attacks)
+    attack_features = attack_features[attack_shuffle]
+    
+    # Clip to reasonable ranges
+    benign_features = np.clip(benign_features, 0, 2)
     attack_features = np.clip(attack_features, 0, 3)
+    
+    # Add label noise (some mislabeled samples, simulating real-world data)
+    if difficulty in ['medium', 'hard']:
+        noise_rate = 0.02 if difficulty == 'medium' else 0.05
+        # Some benign samples that look like attacks
+        noisy_benign = np.random.random(n_benign) < noise_rate
+        benign_features[noisy_benign] = benign_features[noisy_benign] * 1.3 + 0.2
     
     # Combine and create labels
     X = np.vstack([benign_features, attack_features]).astype(np.float32)

@@ -43,10 +43,12 @@ def train_detector(args):
         # Save preprocessor
         preprocessor.save(Path(args.output_dir) / 'preprocessor.joblib')
     else:
-        print("\nUsing synthetic data for training...")
+        difficulty = getattr(args, 'difficulty', 'medium')
+        print(f"\nUsing synthetic data for training (difficulty: {difficulty})...")
         X, y = create_synthetic_ddos_data(
             n_samples=args.n_samples or 50000,
-            attack_ratio=0.3
+            attack_ratio=0.3,
+            difficulty=difficulty
         )
     
     print(f"Data shape: {X.shape}")
@@ -138,8 +140,12 @@ def evaluate_model(args):
         else:
             X, y = preprocessor.fit_transform(df)
     else:
-        print("Using synthetic data for evaluation...")
-        X, y = create_synthetic_ddos_data(n_samples=args.n_samples or 10000)
+        difficulty = getattr(args, 'difficulty', 'medium')
+        print(f"Using synthetic data for evaluation (difficulty: {difficulty})...")
+        X, y = create_synthetic_ddos_data(
+            n_samples=args.n_samples or 10000,
+            difficulty=difficulty
+        )
     
     # Run evaluation
     results = run_full_evaluation(
@@ -169,8 +175,12 @@ def run_adversarial(args):
     model = load_pretrained_model(args.model_path, args.model_type, args.device)
     
     # Load data
-    print("Loading data...")
-    X, y = create_synthetic_ddos_data(n_samples=args.n_samples or 10000)
+    difficulty = getattr(args, 'difficulty', 'medium')
+    print(f"Loading data (difficulty: {difficulty})...")
+    X, y = create_synthetic_ddos_data(
+        n_samples=args.n_samples or 10000,
+        difficulty=difficulty
+    )
     attack_data = X[y == 1]
     benign_data = X[y == 0]
     
@@ -311,6 +321,9 @@ Examples:
                               help='Number of synthetic samples')
     train_parser.add_argument('--sample-size', type=int, default=None,
                               help='Sample size per file')
+    train_parser.add_argument('--difficulty', type=str, default='medium',
+                              choices=['easy', 'medium', 'hard'],
+                              help='Difficulty of synthetic data classification (easy/medium/hard)')
     train_parser.add_argument('--epochs', type=int, default=100,
                               help='Number of training epochs')
     train_parser.add_argument('--batch-size', type=int, default=64,
@@ -335,6 +348,9 @@ Examples:
                              help='Path to test data')
     eval_parser.add_argument('--n-samples', type=int, default=10000,
                              help='Number of synthetic samples')
+    eval_parser.add_argument('--difficulty', type=str, default='medium',
+                             choices=['easy', 'medium', 'hard'],
+                             help='Difficulty of synthetic data classification')
     eval_parser.add_argument('--device', type=str, default='auto',
                              help='Device to use')
     eval_parser.add_argument('--output-dir', type=str, default='./results',
@@ -353,6 +369,9 @@ Examples:
                             help='Type of model')
     adv_parser.add_argument('--n-samples', type=int, default=10000,
                             help='Number of synthetic samples')
+    adv_parser.add_argument('--difficulty', type=str, default='medium',
+                            choices=['easy', 'medium', 'hard'],
+                            help='Difficulty of synthetic data classification')
     adv_parser.add_argument('--device', type=str, default='auto',
                             help='Device to use')
     adv_parser.add_argument('--output-dir', type=str, default='./results',

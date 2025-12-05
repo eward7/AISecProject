@@ -1,0 +1,39 @@
+{
+  "model_type": "cnn",
+  "n_parameters": 747650,
+  "training_time_seconds": 144.67847776412964,
+  "epochs_trained": 25,
+  "final_train_accuracy": 0.9980833333333333,
+  "final_val_accuracy": 0.98925,
+  "final_val_f1": 0.9820158929318277,
+  "test_metrics": {
+    "accuracy": 0.9896,
+    "precision": 0.9744429882044561,
+    "recall": 0.9913333333333333,
+    "f1": 0.9828155981493721,
+    "fpr": 0.011142857142857144,
+    "auc": 0.9993717142857144,
+    "latency_mean_ms": 4.564775249974673,
+    "latency_std_ms": 2.3816419798986335,
+    "latency_p99_ms": 9.456626530118227
+  },
+  "adversarial_metrics": {
+    "fgsm": {
+      "original_detection_rate": 0.9966666666666667,
+      "adversarial_detection_rate": 0.5566666666666666,
+      "evasion_success_rate": 0.44333333333333336,
+      "detection_rate_drop": 0.44000000000000006,
+      "mean_l2_perturbation": "0.8717798",
+      "mean_linf_perturbation": "0.100000024"
+    },
+    "pgd": {
+      "original_detection_rate": 0.9966666666666667,
+      "adversarial_detection_rate": 0.48,
+      "evasion_success_rate": 0.52,
+      "detection_rate_drop": 0.5166666666666667,
+      "mean_l2_perturbation": "0.8179323",
+      "mean_linf_perturbation": "0.100000024"
+    }
+  },
+  "checkpoint_dir": "results_comparison/cnn_hard_20251205_131929"
+}

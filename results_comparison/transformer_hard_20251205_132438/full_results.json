@@ -1,0 +1,39 @@
+{
+  "model_type": "transformer",
+  "n_parameters": 811714,
+  "training_time_seconds": 255.3455662727356,
+  "epochs_trained": 17,
+  "final_train_accuracy": 0.7000083354171877,
+  "final_val_accuracy": 0.6995740415935856,
+  "final_val_f1": 0.0,
+  "test_metrics": {
+    "accuracy": 0.7001301171053949,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "fpr": 0.0,
+    "auc": 0.504847087038138,
+    "latency_mean_ms": 7.062340203077611,
+    "latency_std_ms": 1.5094844927858793,
+    "latency_p99_ms": 9.445714629646316
+  },
+  "adversarial_metrics": {
+    "fgsm": {
+      "original_detection_rate": 0.0,
+      "adversarial_detection_rate": 0.0,
+      "evasion_success_rate": 1.0,
+      "detection_rate_drop": 0.0,
+      "mean_l2_perturbation": "0.8717798",
+      "mean_linf_perturbation": "0.100000024"
+    },
+    "pgd": {
+      "original_detection_rate": 0.0,
+      "adversarial_detection_rate": 0.0,
+      "evasion_success_rate": 1.0,
+      "detection_rate_drop": 0.0,
+      "mean_l2_perturbation": "0.86109453",
+      "mean_linf_perturbation": "0.100000024"
+    }
+  },
+  "checkpoint_dir": "results_comparison/transformer_hard_20251205_132438"
+}

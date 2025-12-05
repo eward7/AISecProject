@@ -280,7 +280,7 @@ class Trainer:
         # Setup scheduler
         if scheduler_type == 'reduce_on_plateau':
             scheduler = ReduceLROnPlateau(
-                optimizer, mode='min', factor=0.5, patience=5, verbose=True
+                optimizer, mode='min', factor=0.5, patience=5
             )
         else:
             scheduler = CosineAnnealingLR(optimizer, T_max=epochs)

@@ -1,0 +1,25 @@
+{
+  "model_type": "hybrid",
+  "n_parameters": 180802,
+  "training_time_seconds": 323.2710168361664,
+  "epochs_trained": 45,
+  "final_train_accuracy": 0.9889166666666667,
+  "final_val_accuracy": 0.9905,
+  "final_val_f1": 0.9841666666666666,
+  "test_metrics": {
+    "accuracy": 0.9896,
+    "precision": 0.9788359788359788,
+    "recall": 0.9866666666666667,
+    "f1": 0.9827357237715804,
+    "fpr": 0.009142857142857144,
+    "auc": 0.9994803333333333,
+    "latency_mean_ms": 2.009788406311941,
+    "latency_std_ms": 1.1730339848831373,
+    "latency_p99_ms": 6.628246109667089
+  },
+  "adversarial_metrics": {
+    "fgsm": null,
+    "pgd": null
+  },
+  "checkpoint_dir": "results_comparison/hybrid_hard_20251205_132855"
+}

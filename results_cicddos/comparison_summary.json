@@ -1,0 +1,86 @@
+{
+  "data_stats": {
+    "total_samples": 200290,
+    "benign_count": 100145,
+    "attack_count": 100145,
+    "num_attack_types": 12,
+    "imbalance_ratio": 1.0
+  },
+  "model_results": {
+    "cnn": {
+      "n_parameters": 747650,
+      "training_time_minutes": 12.44,
+      "test_metrics": {
+        "accuracy": 0.9998,
+        "precision": 0.9995,
+        "recall": 1.0,
+        "f1": 0.9998,
+        "fpr": 0.000499
+      },
+      "adversarial_metrics": {
+        "fgsm": {
+          "original_detection_rate": 1.0,
+          "adversarial_detection_rate": 0.93,
+          "evasion_success_rate": 0.07,
+          "mean_l2_perturbation": 0.8888
+        },
+        "pgd": {
+          "original_detection_rate": 1.0,
+          "adversarial_detection_rate": 0.7533,
+          "evasion_success_rate": 0.2467,
+          "mean_l2_perturbation": 0.7861
+        }
+      }
+    },
+    "lstm": {
+      "n_parameters": 735875,
+      "training_time_minutes": 13.95,
+      "test_metrics": {
+        "accuracy": 0.9994,
+        "precision": 0.9989,
+        "recall": 0.9999,
+        "f1": 0.9994,
+        "fpr": 0.001149
+      },
+      "adversarial_metrics": {
+        "fgsm": {
+          "original_detection_rate": 1.0,
+          "adversarial_detection_rate": 0.7033,
+          "evasion_success_rate": 0.2967,
+          "mean_l2_perturbation": 0.8888
+        },
+        "pgd": {
+          "original_detection_rate": 1.0,
+          "adversarial_detection_rate": 0.5233,
+          "evasion_success_rate": 0.4767,
+          "mean_l2_perturbation": 0.8232
+        }
+      }
+    },
+    "hybrid": {
+      "n_parameters": 180802,
+      "training_time_minutes": 15.76,
+      "test_metrics": {
+        "accuracy": 0.9993,
+        "precision": 0.9986,
+        "recall": 1.0,
+        "f1": 0.9993,
+        "fpr": 0.001448
+      },
+      "adversarial_metrics": {
+        "fgsm": {
+          "original_detection_rate": 1.0,
+          "adversarial_detection_rate": 0.2733,
+          "evasion_success_rate": 0.7267,
+          "mean_l2_perturbation": 0.8888
+        },
+        "pgd": {
+          "original_detection_rate": 0.6667,
+          "adversarial_detection_rate": 0.5867,
+          "evasion_success_rate": 0.4133,
+          "mean_l2_perturbation": 0.5708
+        }
+      }
+    }
+  }
+}

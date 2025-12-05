@@ -418,6 +418,11 @@ class AdversarialAttacker:
         x = x.clone().detach().to(self.device).requires_grad_(True)
         y = y.clone().detach().to(self.device)
         
+        # Temporarily set to training mode for RNN backward compatibility with cuDNN
+        # We disable dropout by using torch.no_grad() context for intermediate computations
+        was_training = self.target_model.training
+        self.target_model.train()
+        
         self.target_model.zero_grad()
         
         outputs = self.target_model(x)
@@ -437,6 +442,10 @@ class AdversarialAttacker:
             
             # Move towards higher loss (add gradient)
             x_adv = x + epsilon * x.grad.sign()
+        
+        # Restore original mode
+        if not was_training:
+            self.target_model.eval()
         
         return x_adv.detach()
     
@@ -469,6 +478,10 @@ class AdversarialAttacker:
         x_adv = x.clone().detach().to(self.device)
         y = y.clone().detach().to(self.device)
         
+        # Temporarily set to training mode for RNN backward compatibility with cuDNN
+        was_training = self.target_model.training
+        self.target_model.train()
+        
         for _ in range(num_iter):
             x_adv.requires_grad_(True)
             
@@ -488,6 +501,10 @@ class AdversarialAttacker:
             # Project back to epsilon ball
             perturbation = torch.clamp(x_adv - x_orig, -epsilon, epsilon)
             x_adv = (x_orig + perturbation).detach()
+        
+        # Restore original mode
+        if not was_training:
+            self.target_model.eval()
         
         return x_adv
     

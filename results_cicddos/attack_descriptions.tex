@@ -1,0 +1,19 @@
+\subsection{CICDDoS2019 Attack Types}
+\label{sec:attack_types}
+
+The CICDDoS2019 dataset contains 12 distinct DDoS attack types, representing real-world threats:
+
+\begin{description}[leftmargin=2cm,style=nextline]
+    \item[DrDoS_DNS] Exploits DNS servers to amplify traffic by ~28-54x using ANY queries
+    \item[DrDoS_LDAP] Leverages LDAP directory services for ~46-55x amplification factor
+    \item[DrDoS_MSSQL] Abuses MS-SQL Server Resolution Service for traffic reflection
+    \item[DrDoS_NTP] Exploits Network Time Protocol monlist command for ~556x amplification
+    \item[DrDoS_NetBIOS] Uses NetBIOS Name Service for ~3.8x traffic amplification
+    \item[DrDoS_SNMP] Exploits SNMP GetBulk requests for ~6x amplification factor
+    \item[DrDoS_SSDP] Abuses Simple Service Discovery Protocol for ~30x amplification
+    \item[DrDoS_UDP] Generic UDP-based reflection attack using various services
+    \item[Syn] TCP SYN flood exhausting server connection queue resources
+    \item[TFTP] Exploits Trivial File Transfer Protocol for reflection attacks
+    \item[UDP-lag] UDP-based attack causing network congestion and latency
+    \item[WebDDoS] Application-layer attacks targeting HTTP/HTTPS services
+\end{description}
